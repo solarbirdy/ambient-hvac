@@ -43,7 +43,7 @@ INSTALLATION
 
 It's not that ugly, but it's not exactly a script either.
 
-Copy all the .php files into an accessible directory on your webserver with typical permissions. Two additional files - tempWeatherDataCache and tempWindows - must be _writeable_ by the web server itself, and in the same directory.
+Copy all the .php files into an accessible directory on your webserver with typical permissions. Two additional files - tempWeatherDataCache and tempWindows - must be _writeable_ by the web server itself, and in the same directory. Put the css file into a subdirectory called "css" (or you could not, and edit the code to look for it in the same directory as everything else, that's okay too). The .ino file is for the arduino leonardo, so it can report physical vent/window status.
 
 That's not so bad, right?
 
