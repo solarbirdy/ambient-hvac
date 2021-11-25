@@ -30,7 +30,7 @@ To use all functionality, you will need:
 
 To use window/vent status detection, you will need:
 
-* One Arduino Leonardo, connected to appropriate magnetic switch sensors on its digial lines
+* One Arduino Leonardo, connected to appropriate magnetic switch sensors on its digital lines
 * Physical access to your web server's serial port, for communication with the Arduino
 
 Eventually I hope to add at least some degree of vent automation, which will add a requirement for some sort of Raspberry Pi devices with switching capability.
