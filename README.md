@@ -17,6 +17,10 @@ The physical window/door sensor status display lives on the "Zones" page, and is
 
 Modes and windows/vents which cannot be automatically sensed can be changed on the "Modes" page, and in some cases, on the "Stations" page.
 
+CURRENT STATE
+
+Version 0.3 Alpha. This should not be seen as a simple installation package; it's not, at least not yet. It should be seen as base code which can be used to implement a similar solution specific to your location. I don't even consider this feature-complete, though all implemented functionality works as it should and most of it (everything except data cacheing) has some months of testing.
+
 SYSTEM REQUIREMENTS
 
 To use all functionality, you will need:
