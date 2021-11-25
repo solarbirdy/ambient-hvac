@@ -1,0 +1,185 @@
+body {
+        overflow-y: scroll;
+        font-family: Helvetica;
+}
+
+td {
+	text-align: center;
+}
+
+a {
+	text-decoration: none;
+	color: #551A8B;
+}
+
+.nodata {
+	text-align: center;
+        color: Maroon;
+        font-size: 200px;
+        font-weight: bold;
+}
+
+.humidity {
+	font-size: 24px;
+	color: purple;
+	font-weight: lighter;
+}
+
+.portalOpen {
+	color: purple;
+	font-size: 18px;
+}
+
+.portalAllOpen {
+	font-size: 24px;
+	color: purple;
+	font-weight: lighter;
+}
+
+.portalClosed {
+	color: #165500;
+	font-size: 18px;
+}
+
+.portalAllClosed {
+	font-size: 24px;
+	color: #165500;
+	font-weight: lighter;
+}       
+
+.portalLocation {
+	font-weight: lighter;
+	font-size: 14px;
+}
+
+.temp {
+	color: #303030;
+	font-size: 50px;
+	font-weight: bold;
+}
+
+.wind {
+        color: purple;
+        font-size: 32px;
+        font-weight: bold;
+	line-height: 45%;
+}
+
+.tempCooler {
+	color: #0000a6;
+        font-size: 50px;
+        font-weight: bold;
+}
+
+.tempWarmer {
+	color: Maroon;
+        font-size: 50px;
+        font-weight: bold;
+}
+
+.tempBiggest {
+        color: #303030;
+        font-size: 100px;
+        font-weight: bold;
+}
+
+.tempCoolerBiggest {
+	color: #0000a6;
+	font-size: 100px;
+	font-weight: bold;
+}
+
+.tempWarmerBiggest {
+        color: Maroon;
+        font-size: 100px;
+        font-weight: bold;
+}
+
+.humidex {
+	font-size: 24px;
+	color: purple;
+	font-weight: lighter;
+}
+
+.shuttered {
+	font-size: 24px;
+	color: darkgreen;
+	font-weight: lighter;
+}
+
+.blockdivider {
+        font-size: 24px;
+        color: purple;
+}
+
+.unit {
+	font-size: 35px;
+	font-weight: bold;
+}
+
+.windunit {
+        font-size: 22px;
+	font-weight: lighter;
+	line-height: 100%;
+}
+
+.winddirection {
+	font-size: 16px;
+}
+
+.unitBiggest {
+	font-size: 50px;
+	font-weight: bold;
+}
+
+.location {
+	font-size: 33px;
+	color: #303030;
+	font-weight: lighter;
+}
+
+.locationShorter {
+	font-size: 33px;
+	color: #303030;
+	font-weight: lighter;
+	line-height: 50%;
+}
+
+.locationOK {
+        font-size: 33px;
+        color: #303030;
+        font-weight: lighter;
+}
+
+.locationactionOK {
+	color: $303030;
+}
+
+.locationBAD {
+        font-size: 33px;
+        color: purple;
+        font-weight: lighter;
+}
+
+.locationactionBAD {
+	font-style: italic;
+	color: purple;
+}
+
+.locationcol {
+	text-align: center;
+	padding: 0 0 20px 0;
+}
+
+.datacol {
+	margin: 0 0 10px 0;
+}
+
+.headingtext {
+	font-size: 28px;
+	font-weight: bold;
+}
+
+.headingrow {
+	padding: 20px 0 0 0;
+}
