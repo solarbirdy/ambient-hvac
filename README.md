@@ -5,7 +5,7 @@ OVERVIEW
 
 This system uses Ambient Weather and Arduino Leonardo hardware and software support to implement air-exchange cooling and heating assist, though it is mostly effective for cooling. Mostly written in PHP, it serves information display panels over the web, supporting metric, kelvin, and freedom weather units.
 
-The basic HVAC functionality lives on the "Stations" display. Ysing pairs of temperature sensors, this display monitors temperatures inside and outside near air-exchange opportunities, such as windows or possibly vents, and display appropriate actions the user should take at any given time for optimal cooling, or, in theory, heating. In my case, this mostly consists of opening and closing windows and turning on and off the air-exchange vent on our primary HVAC system, but it is not in any way limited to that.
+The basic HVAC functionality lives on the "Stations" display. Using pairs of temperature sensors, this display monitors temperatures inside and outside near air-exchange opportunities, such as windows or possibly vents, and display appropriate actions the user should take at any given time for optimal cooling, or, in theory, heating. In my case, this mostly consists of opening and closing windows and turning on and off the air-exchange vent on our primary HVAC system, but it is not in any way limited to that.
 
 It has support for "winter," "summer," and "smoke" modes, along with a "disable" mode. These affect the recommendations the software makes. In the latter case, turning them off entirely.
 
