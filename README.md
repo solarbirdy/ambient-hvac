@@ -21,7 +21,7 @@ CURRENT STATE
 
 Version 0.6 Alpha. This should not be seen as a simple package to install; it's not, at least not yet. It should be seen as base code which can be used to implement a similar solution specific to your location. I don't even consider this feature-complete, though all implemented functionality works as it should and most of it (everything except data cacheing) has some months of testing.
 
-Version 0.6 adds
+Version 0.6 adds a configuration file that actually works (on my machine lol), a substantial refactoring and consolidation of the code base (including a lot, and I do mean a lot, of redundant code elimination), the ability to name your air sensor pairs, and fixes a bunch of bugs. Basically, this is the long overdue "next drop" I promised early in the plague.
 
 SYSTEM REQUIREMENTS
 
