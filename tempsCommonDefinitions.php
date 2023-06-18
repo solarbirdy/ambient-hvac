@@ -1,4 +1,12 @@
 <?php
+
+// not all pages have a default (or any) unit, make sure one gets defined
+
+if ( !isset($chOurUnitCaps) ) $chOurUnitCaps = "C";
+
+// include configuration options
+include 'tempsConfigDefinitions.php';
+
 $chCelciusUnitCaps="C";
 $chCelciusUnitLowercase="c";
 $chFarenheitUnitCaps="F";

@@ -6,7 +6,10 @@
     <link rel="STYLESHEET" type="text/css" href="css/weatherstyle.css">
     <meta http-equiv="refresh" content="119">
 <?php
-if ($_SERVER['REMOTE_ADDR'] != "__YOUR_DHCP_LAN_ROOT_HERE__") {
+// include common definitions in this PHP block too
+include 'tempsCommonDefinitions.php';
+
+if ($_SERVER['REMOTE_ADDR'] != $rgchOurIP) {
     print('    <meta http-equiv="refresh" content="0; URL=tempOverviewC.php">');
     } else {
     print('    <meta http-equiv="refresh" content="59">');
@@ -34,6 +37,8 @@ if (isset($_GET["unit"])) {
 $rgchOverviewPage="tempOverview" . $chOurUnitCaps . ".php";
 $rgchStationsPage="temp" . $chOurUnitCaps . ".php";
 
+// include common definitions
+include 'tempsCommonDefinitions.php';
 // include common functions code
 include 'tempsCommonFunctions.php';
 
@@ -57,7 +62,7 @@ $rgchAllDoorsClosed="<span class=portalClosed>all doors closed</span>";
 
 // If we're not on the LAN, bail out. We'll refresh anyway.
 
-if ($_SERVER['REMOTE_ADDR'] != "__YOUR_DHCP_LAN_ROOT_HERE__") {
+if ($_SERVER['REMOTE_ADDR'] != $rgchOurIP) {
     exit;
     }
 
@@ -85,8 +90,7 @@ if ($rgchRealWindowsJ == NULL) {
 $rgchRealWindows=json_decode($rgchRealWindowsJ, true);
 
 // Get virtual data for zones north and west up
-$rgchWindowFile="tempWindows";
-$data = file_get_contents($rgchWindowFile);
+$data = file_get_contents($fileSystemStatusCache);
 $data = mb_substr($data, strpos($data, '{'));
 $data = mb_substr($data, 0, -1);
 // And decode it
@@ -99,12 +103,12 @@ print('<table border=0 cellpadding=10px cellspacing=10px align="center" valign="
 // ROW 1, COLUMN 1
 print("<tr><td style='vertical-align: top'>");
 
-// EAST ZONE
-print("<div class='locationShorter'>east</div><br/>");
-if ($rgchVirtualWindows["east"]=="open") {
-    printf('%s<br/><a href="tempWinToggle.php/?window=east&status=closed"><span class=portalLocation>mark as closed</span></a></div>', $rgchLogicalPortalOpen);
+// FIRST ZONE (east in dev's install)
+print("<div class='locationShorter'>" . $rgchStationNames[1] . "</div><br/>");
+if ($rgchVirtualWindows[$rgchStationNames[1]]=="open") {
+    printf('%s<br/><a href="tempWinToggle.php/?window=%s&status=closed"><span class=portalLocation>mark as closed</span></a></div>', $rgchLogicalPortalOpen, $rgchStationNames[1] );
     } else {
-    printf('%s<br/><a href="tempWinToggle.php/?window=east&status=open"><span class=portalLocation>mark as open</span></a>', $rgchLogicalPortalClosed);
+    printf('%s<br/><a href="tempWinToggle.php/?window=%s&status=open"><span class=portalLocation>mark as open</span></a>', $rgchLogicalPortalClosed, $rgchStationNames[1] );
     }
 
 // ROW 1, COLUMN 2
@@ -131,7 +135,7 @@ print("<td>");
 //print("<td style='vertical-align: top'>");
 
 // WEST MAIN ZONE
-print("<div class='locationShorter'>west main</div><br/>");
+print("<div class='locationShorter'>" . $rgchStationNames[2] . "</div><br/>");
 
 switch ($rgchRealWindows["digitalpin5"]+
         $rgchRealWindows["digitalpin6"]+
@@ -211,7 +215,7 @@ print("<tr><td style='vertical-align: top'>");
 //print("<tr><td>");
 
 // WEST UP ZONE
-print("<div class='locationShorter'>west up</div><br/>");
+print("<div class='locationShorter'>" . $rgchStationNames[3] . "</div><br/>");
 if ($rgchVirtualWindows["west up"]=="open") {
     printf('%s<br/><a href="tempWinToggle.php/?window=west up&status=closed"><span class=portalLocation>mark as closed</span></a></div>', $rgchLogicalPortalOpen);
     } else {
@@ -255,7 +259,7 @@ print("</td></tr>");
 print("<tr><td>");
 
 // NORTH ZONE
-print("<div class='locationShorter'>north</div><br/>");
+print("<div class='locationShorter'>" . $rgchStationNames[4] . "</div><br/>");
 
 if ($rgchRealWindows["digitalpin2"] == 0) {
    print($rgchAllWindowsOpen); } else { print($rgchAllWindowsClosed); }
@@ -278,7 +282,7 @@ $iAllWindows=$rgchRealWindows["digitalpin2"]+
     $rgchRealWindows["digitalpin12"];
 
 if ($rgchVirtualWindows["west up"]=="closed") $iAllWindows++;
-if ($rgchVirtualWindows["east"]=="closed") $iAllWindows++;
+if ($rgchVirtualWindows[ $rgchStationNames[1] ]=="closed") $iAllWindows++;
 
 if (($iAllWindows == 12) && ($rgchRealWindows["digitalpin4"] == 1))
     {

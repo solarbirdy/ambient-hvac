@@ -14,7 +14,6 @@
 
 // SET DISPLAY UNIT BEFORE INCLUDING COMMON DEFINITIONS
 // Everything is dependant upon this
-//$chOurUnitCaps=substr(basename(__FILE__, '.php'),-1);
 $chOurUnitCaps=substr(basename($_SERVER['REQUEST_URI'], '.php'),-1);
 $rgchOverviewPage="tempOverview" . $chOurUnitCaps. ".php";
 
@@ -22,13 +21,18 @@ $rgchOverviewPage="tempOverview" . $chOurUnitCaps. ".php";
 $chCelciusPage="tempC.php";
 $chFarenheitPage="tempF.php";
 $chKelvinPage="tempK.php";
-$chRankinePage="tempC.php";     // THIS IS INTENTIONAL
+$chRankinePage="tempR.php";     // THIS IS INTENTIONAL
+
+// include configuration
+include 'tempsConfigDefinitions.php';
 
 // include standard definitions
 include 'tempsCommonDefinitions.php';
 
-// include common functions
+// and include common functions
+//echo $chOurUnitCaps . "|";
 include 'tempsCommonFunctions.php';
+//echo $chOurUnitCaps . "|";
 
 // If unit setting somehow gets fucked up, default to Rankine so people know
 // it's broken because honestly, who uses R? Nobody. And no one should.
@@ -44,10 +48,13 @@ if ( ($chOurUnitCaps != $chCelciusUnitCaps) &&
 function DisplayLocationStatus($rgchLocation, $fpTemp1, $fpTemp2) {
 
     global $rgchOperatingSeason;
+    global $fileSystemStatusCache;
+    global $rgchOurIP;
+    global $rgchStationNames;
+    global $cNumberOfStations;
 
     // Get current logical status of windows. May not match physical.
-    $rgchWindowFile="tempWindows";
-    $data = file_get_contents($rgchWindowFile);
+    $data = file_get_contents($fileSystemStatusCache);
     $data = mb_substr($data, strpos($data, '{'));
     $data = mb_substr($data, 0, -1);
     $windows = json_decode($data, true);
@@ -58,11 +65,12 @@ function DisplayLocationStatus($rgchLocation, $fpTemp1, $fpTemp2) {
     // Get current PHYSICAL status of windows. May not match logical!
     // only "north" and "west main" have physical sensors as of
     // 2021/8/18 so do this only if it's one of those
-    if (($rgchLocation == "north") || ($rgchLocation == "west main")) {
+    //if (($rgchLocation == $rgchStationNames[4] ) || ($rgchLocation == $rgchStationNames[2] )) {
+    if ( $rgchStationNames[$rgchLocation] == "sensed" ) {
         $rgchRealWindowsJ=rgchAcquireRealWindowStatus();
         if ($rgchRealWindowsJ != NULL) {
             $rgchRealWindows=json_decode($rgchRealWindowsJ, true);
-            if ($rgchLocation == "north") {
+            if ($rgchLocation == $rgchStationNames[4]) {
                 // north is laundry, or $rgchRealWindows["digitalpin2"]
                 // "0" means open, "1" means closed.
                 if ( $rgchRealWindows["digitalpin2"] == "0" ) {
@@ -116,7 +124,7 @@ function DisplayLocationStatus($rgchLocation, $fpTemp1, $fpTemp2) {
     // ...this is the wrong way to do it - we should be checking for a
     // humidity of zero, but we don't have those numbers with us, so can't.
     if ( ($rgchOperatingSeason=="disable") ||		  // disabled
-         ($_SERVER['REMOTE_ADDR'] != "173.160.243.41") || // disable off LAN
+         ($_SERVER['REMOTE_ADDR'] != $rgchOurIP) ||	  // disable off LAN
          (($fpTemp1 == 0) || ($fpTemp2 == 0)) )           // invalid temp(s)
         $rgchShouldBe=$rgchWindowStatus;
     if ($rgchOperatingSeason=="smoke") $rgchShouldBe="closed";
@@ -131,7 +139,8 @@ function DisplayLocationStatus($rgchLocation, $fpTemp1, $fpTemp2) {
             // that's more complicated now. If it's not a physically known
             // window, include a link. If it _is_ a physically known window,
             // do NOT include the link.
-            if (($rgchLocation != "north") && ($rgchLocation != "west main"))
+            // if (($rgchLocation != $rgchStationNames[4]) && ($rgchLocation != $rgchStationNames[2]))
+            if ( $rgchStationNames[$rgchLocation] == "manual" )
                 {
                 $rgchWindowStatus="closed, better " .
                     "<a href='tempWinToggle.php/?window=" .
@@ -145,7 +154,8 @@ function DisplayLocationStatus($rgchLocation, $fpTemp1, $fpTemp2) {
             // that's more complicated now. If it's not a physically known
             // window, include a link. If it _is_ a physically known window,
             // do NOT include the link.
-            if (($rgchLocation != "north") && ($rgchLocation != "west main"))
+            //if (($rgchLocation != $rgchStationNames[4]) && ($rgchLocation != $rgchStationNames[2]))
+            if ( $rgchStationNames[$rgchLocation] == "manual" )
                 { 
                 $rgchWindowStatus=
                     "open, better <a href='tempWinToggle.php/?window=" .
@@ -167,19 +177,18 @@ function DisplayLocationStatus($rgchLocation, $fpTemp1, $fpTemp2) {
 //
 // main MAIN
 //
+
 // Sometimes the server doesn't respond correctly, I test for that against
 // humidity of zero. Since they throttle access to the server with free API
 // keys, I pause half of a second whenever that happens before trying again.
 // After 3 tries, I give up.
 
-$file = "https://api.ambientweather.net/v1/devices?applicationKey=__YOUR_APPLICATION_KEY__apiKey=__YOUR_API_KEY__";
-$fileWeatherDataCache = "tempWeatherDataCache";
 $rgchPolledOrCached = "Polled";
 $dataTries=0;
 
 do {
     $dataTries++;
-    $data = file_get_contents($file);
+    $data = file_get_contents($fileAmbientServer);
     $data = mb_substr($data, strpos($data, '{'));
     $data = mb_substr($data, 0, -1);
     $sensors = json_decode($data, true);
@@ -212,10 +221,10 @@ if (!$sensors) {
 // print the header row
     print("<tr><td width=30% class='headingrow'><span class='headingtext'>Station</span></td><td width=35% class='headingrow'><span class='headingtext'>Outdoor</span></td><td width=35% class='headingrow'><span class='headingtext'>Indoor</span></td></tr>");
 
-// four rows of temperatures
+// up to four rows of temperatures, always at least one
 print("<tr>");
     print("<td class='locationcol'>");
-    DisplayLocationStatus("east",
+    DisplayLocationStatus($rgchStationNames[1],
         $sensors['lastData']['temp1f'],
         $sensors['lastData']['temp5f']);
     print("</td>");
@@ -243,9 +252,10 @@ print("<tr>");
     print("</td>");
 print("</tr>");
 
+if ( $cNumberOfStations >= 2 ) {
 print("<tr>");
     print("<td class='locationcol'>");
-    DisplayLocationStatus("west main",
+    DisplayLocationStatus($rgchStationNames[2], // west main (at dev's loation)
         $sensors['lastData']['temp2f'],
         $sensors['lastData']['temp6f']);
     print("</td>");
@@ -273,10 +283,12 @@ print("<tr>");
         $chOurUnitLowercase);
     print("</td>");
 print("</tr>");
+}
 
+if ( $cNumberOfStations >= 3 ) {
 print("<tr>");
     print("<td class='locationcol'>");
-    DisplayLocationStatus("west up",
+    DisplayLocationStatus($rgchStationNames[3], // west up (at dev's location)
         $sensors['lastData']['temp3f'],
         $sensors['lastData']['temp7f']);
     print("</td>");
@@ -304,10 +316,12 @@ print("<tr>");
         $chOurUnitLowercase);
     print("</td>");
 print("</tr>");
+}
 
+if ( $cNumberOfStations >= 4 ) {
 print("<tr>");
     print("<td class='locationcol'>");
-    DisplayLocationStatus("north",
+    DisplayLocationStatus($rgchStationNames[4], // north (at dev's location)
         $sensors['lastData']['temp4f'],
         $sensors['lastData']['temp8f']);
     print("</td>");
@@ -335,6 +349,7 @@ print("<tr>");
         $chOurUnitLowercase);
     print("</td>");
 print("</tr>");
+}
 
 print("</table>");
 
@@ -352,7 +367,7 @@ $datareaddate = DateTime::createFromFormat('U', $ts);
 // Set time zone
 $datareaddate->setTimezone(new DateTimeZone('America/Los_Angeles'));
 
-if ($_SERVER['REMOTE_ADDR'] != "173.160.243.41") // disable if not LAN
+if ($_SERVER['REMOTE_ADDR'] != $rgchOurIP) // disable if not LAN
     {
     $rgchModeLink=$rgchOperatingSeason;
     } else {
@@ -366,7 +381,7 @@ printf("<center><br/>%s %s (%s mode)<br/>",
     $datareaddate->format('g:ia, l, F jS'),
     $rgchModeLink);
 printf("<a href='%s'>Overview</a> | ", $rgchOverviewPage);
-if ($_SERVER['REMOTE_ADDR'] == "173.160.243.41") {
+if ($_SERVER['REMOTE_ADDR'] == $rgchOurIP) {
     // pass our unit so if they go to overview from zones they keep their unit
     printf('<a href="tempZones.php?unit=%s">Zones</a> | ',$chOurUnitCaps);
     }

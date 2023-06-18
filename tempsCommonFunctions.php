@@ -5,6 +5,10 @@
 // system.
 //
 
+// FIRST include common definitions (do we actually need this?)
+
+include 'tempsCommonDefinitions.php';
+
 //
 // rgchAcquireRealWindowStatus()
 //
@@ -68,6 +72,60 @@ function rgchAcquireRealWindowStatus() {
 
     return $rgchRealWindowsJSON;
     }
+
+// rgchAcquireVentStatus
+// Get the status of any given vent numbered 0-3
+// return string "open" or "closed" if relay is running and talking
+// returns null if can't be contacted or return is damaged
+
+function rgchAcquireVentStatus(int $iVentNumber) {
+
+    // initialise curl, set options, get response
+    $curl = curl_init('http://192.168.1.230/api/relay');
+
+    // set up some short timeouts - 3 seconds to connect, 3 to respond
+    // neither should be more than 100ms irl
+    curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 3); 
+    curl_setopt($curl, CURLOPT_TIMEOUT, 3);
+
+    // set up for a clean GET and then GET
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl, CURLOPT_HTTPGET, true);
+    $rgchResponse=curl_exec($curl);
+
+    // close curl
+    curl_close($curl);
+
+    // null response, pass that on
+    if (!$rgchResponse) { return null; }
+
+    // parse the data
+    $data = json_decode($rgchResponse);
+
+    // if we didn't get a valid answer from the box, return null
+    if ( !$data ) { return null; }
+
+    // now we have data yay
+    if ( $data->relays[$iVentNumber] == 1 ) {
+        return "open";
+        } else {
+        return "closed";
+        };
+}
+
+// rgchGetCurrentSeasonMode
+//
+// function to get the current season in a string.
+function rgchGetCurrentSeasonMode() {
+
+    global $fileSystemStatusCache;
+
+    $data = file_get_contents($fileSystemStatusCache);
+    $data = mb_substr($data, strpos($data, '{'));
+    $data = mb_substr($data, 0, -1);
+    $windows = json_decode($data, true);
+    return $windows["season"];
+}
 
 //
 // fpConvertTemp(temperature in F)
@@ -201,10 +259,78 @@ function PrintDataBrick($rgchTempColour, $fpTemp1, $fpUnit1, $fpHumidity, $fpHum
         } else {
         print("<span class='temp'>----</span>");
         print("<br/>");
-	      print("<span class='humidity'>--</span>");
+	print("<span class='humidity'>--</span>");
         print("<span class='humidex'>--</span>");
         }
     return;
 }
+
+//
+//
+// fpAverageValidity (temperature and humidity pairs)
+//
+// Produces an average but only of the valid values in the list. Minimum
+// two values, as many as ten. The stupid part is that it has to check
+// the vailidity of each value (termined by humidity of 0%, impossible)
+// because sometimes we don't get data back from the server.
+//
+function fpAverageValidity($fpTemp1, $fpHumid1, $fpTemp2, $fpHumid2,
+                           $fpTemp3 = NULL, $fpHumid3 = 0,
+                           $fpTemp4 = NULL, $fpHumid4 = 0,
+                           $fpTemp5 = NULL, $fpHumid5 = 0,
+                           $fpTemp6 = NULL, $fpHumid6 = 0,
+                           $fpTemp7 = NULL, $fpHumid7 = 0,
+                           $fpTemp8 = NULL, $fpHumid8 = 0,
+                           $fpTemp9 = NULL, $fpHumid9 = 0,
+                           $fpTemp10 = NULL, $fpHumid10 = 0)
+{
+    $iTotalValid=0;
+    $iTotalTemps=0;
+    if ($fpHumid1 != 0) {
+       $iTotalValid++;
+       $iTotalTemps+=$fpTemp1;
+       }
+    if ($fpHumid2 != 0) {
+       $iTotalValid++;
+       $iTotalTemps+=$fpTemp2;
+       }
+    if ($fpHumid3 != 0) {
+       $iTotalValid++;
+       $iTotalTemps+=$fpTemp3;
+       }
+    if ($fpHumid4 != 0) {
+       $iTotalValid++;
+       $iTotalTemps+=$fpTemp4;
+       }
+    if ($fpHumid5 != 0) {
+       $iTotalValid++;
+       $iTotalTemps+=$fpTemp5;
+       }
+    if ($fpHumid6 != 0) {
+       $iTotalValid++;
+       $iTotalTemps+=$fpTemp6;
+       }
+    if ($fpHumid7 != 0) {
+       $iTotalValid++;
+       $iTotalTemps+=$fpTemp7;
+       }
+    if ($fpHumid8 != 0) {
+       $iTotalValid++;
+       $iTotalTemps+=$fpTemp8;
+       }
+    if ($fpHumid9 != 0) {
+       $iTotalValid++;
+       $iTotalTemps+=$fpTemp9;
+       }
+    if ($fpHumid10 != 0) {
+       $iTotalValid++;
+       $iTotalTemps+=$fpTemp10;
+       }
+
+    // really this is an error but it needs a number back
+    if ($iTotalValid == 0) return $pTemp1;
+    return $iTotalTemps/$iTotalValid;
+}
+
 
 ?>

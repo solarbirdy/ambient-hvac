@@ -5,7 +5,9 @@
     <title>Toggle Venting and Seasons</title>
     <link rel="STYLESHEET" type="text/css" href="css/weatherstyle.css">
 <?php // If not on the LAN, bounce home.
-if ($_SERVER['REMOTE_ADDR'] != "__YOUR_LAN_DHCP_ROOT__") {
+// we need this in each block :/
+include 'tempsCommonDefinitions.php';
+if ($_SERVER['REMOTE_ADDR'] != $rgchOurIP) {
     print('    <meta http-equiv="refresh" content="0; URL=tempOverviewC.php">');
     }
 ?>
@@ -13,18 +15,20 @@ if ($_SERVER['REMOTE_ADDR'] != "__YOUR_LAN_DHCP_ROOT__") {
 </head>
 <body topmargin="0" style="padding-top: 0px; margin: 0px;">
 <?php
-if ( $_SERVER['REMOTE_ADDR'] == "__YOUR_LAN_DHCP_ROOT__" ) { // on the lan, welcome to panel
+
+// include common definitions - needed for our canonical okay IP address
+include 'tempsCommonDefinitions.php';
+// include common functions code - not needed but might be useful someday
+include 'tempsCommonFunctions.php';
+
+if ( $_SERVER['REMOTE_ADDR'] == $rgchOurIP ) { // on the lan, welcome to panel
     print '<span class="location">';
     print '<style> a:link { color: maroon; font-variant: small-caps; font-style: normal; text-decoration: none; font-size: smaller; } a:visited { color: maroon; font-variant: small-caps; font-style: normal; text-decoration: none; font-size: smaller; } </style>';
     print '<p><div style="line-height: 130%"><center>';
-    print '<a href="tempWinToggle.php/?window=east&status=closed">close</a> &nbsp; east &nbsp; ';
-    print '<a href="tempWinToggle.php/?window=east&status=open">open</a><br/>';
-//    print '<a href="tempWinToggle.php/?window=west main&status=closed">close</a> &nbsp; west main &nbsp; ';
-//    print '<a href="tempWinToggle.php/?window=west main&status=open">open</a><br/>';
-    print '<a href="tempWinToggle.php/?window=west up&status=closed">close</a> &nbsp; west up &nbsp; ';
-    print '<a href="tempWinToggle.php/?window=west up&status=open">open</a><br/>';
-//    print '<a href="tempWinToggle.php/?window=north&status=closed">close</a> &nbsp; north &nbsp; ';
-//    print '<a href="tempWinToggle.php/?window=north&status=open">open</a><br/></center></div></p>';
+    print '<a href="tempWinToggle.php/?window=' . $rgchStationNames[1] . '&status=closed">close</a> &nbsp; ' . $rgchStationNames[1] . ' &nbsp; '; // east
+    print '<a href="tempWinToggle.php/?window=' . $rgchStationNames[1] . '&status=open">open</a><br/>'; // east
+    print '<a href="tempWinToggle.php/?window=' . $rgchStationNames[3] . '&status=closed">close</a> &nbsp; ' . $rgchStationNames[3] . ' &nbsp; '; // west up
+    print '<a href="tempWinToggle.php/?window=' . $rgchStationNames[3] . '&status=open">open</a><br/>'; // west up
     print '<p>';
     print '<center>select mode<br/><a href="tempWinToggle.php/?window=season&status=summer">summer</a> &nbsp; ';
     print '<a href="tempWinToggle.php/?window=season&status=winter">winter</a> &nbsp; ';

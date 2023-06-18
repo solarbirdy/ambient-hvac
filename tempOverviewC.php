@@ -37,72 +37,6 @@ if ( ($chOurUnitCaps != $chCelciusUnitCaps) &&
     $chOurUnitCaps=$chRankineUnitCaps;
 
 //
-// fpAverageValidity (temperature and humidity pairs in F)
-//
-// Produces an average but only of the valid values in the list. Minimum
-// two values, as many as ten. The stupid part is that it has to check
-// the vailidity of each value (termined by humidity of 0%, impossible)
-// because sometimes we don't get data back from the server.
-//
-function fpAverageValidity($fpTemp1, $fpHumid1, $fpTemp2, $fpHumid2,
-                           $fpTemp3 = NULL, $fpHumid3 = 0,
-                           $fpTemp4 = NULL, $fpHumid4 = 0,
-                           $fpTemp5 = NULL, $fpHumid5 = 0,
-                           $fpTemp6 = NULL, $fpHumid6 = 0,
-                           $fpTemp7 = NULL, $fpHumid7 = 0,
-                           $fpTemp8 = NULL, $fpHumid8 = 0,
-                           $fpTemp9 = NULL, $fpHumid9 = 0,
-                           $fpTemp10 = NULL, $fpHumid10 = 0)
-{
-    $iTotalValid=0;
-    $iTotalTemps=0;
-    if ($fpHumid1 != 0) {
-       $iTotalValid++;
-       $iTotalTemps+=$fpTemp1;
-       }
-    if ($fpHumid2 != 0) {
-       $iTotalValid++;
-       $iTotalTemps+=$fpTemp2;
-       }
-    if ($fpHumid3 != 0) {
-       $iTotalValid++;
-       $iTotalTemps+=$fpTemp3;
-       }
-    if ($fpHumid4 != 0) {
-       $iTotalValid++;
-       $iTotalTemps+=$fpTemp4;
-       }
-    if ($fpHumid5 != 0) {
-       $iTotalValid++;
-       $iTotalTemps+=$fpTemp5;
-       }
-    if ($fpHumid6 != 0) {
-       $iTotalValid++;
-       $iTotalTemps+=$fpTemp6;
-       }
-    if ($fpHumid7 != 0) {
-       $iTotalValid++;
-       $iTotalTemps+=$fpTemp7;
-       }
-    if ($fpHumid8 != 0) {
-       $iTotalValid++;
-       $iTotalTemps+=$fpTemp8;
-       }
-    if ($fpHumid9 != 0) {
-       $iTotalValid++;
-       $iTotalTemps+=$fpTemp9;
-       }
-    if ($fpHumid10 != 0) {
-       $iTotalValid++;
-       $iTotalTemps+=$fpTemp10;
-       }
-
-    // really this is an error but it needs a number back
-    if ($iTotalValid == 0) return $pTemp1;
-    return $iTotalTemps/$iTotalValid;
-}
-
-//
 // function to print the biggest temperature number in 4.1f or 2.0f
 // depending upon which page version we are. code unification basically
 // this is unique to the overview panel, so not in common code
@@ -139,7 +73,7 @@ function PrintDewpoint($fpDisplayTemp, $chUnit) {
 // function to print an outdoor temp/humidity/humidex brick,
 // uses the above functions plus common code
 //
-function PrintOutdoorDataBrick($rgchTempColour, $fpTemp1, $fpUnit1, $fpHumidity, $fpHumidex, $fpDewpoint, $fpComposite, $fpHeatPillow, $fpUnit2) {
+function PrintOutdoorDataBrick($rgchTempColour, $fpTemp1, $fpUnit1, $fpHumidity, $fpHumidex, $fpDewpoint, $fpComposite, $fpHeatPillow, $fpUnit2, $iInPPM, $iOutPPM) {
 
     PrintLargestTemp($rgchTempColour . "Biggest", $fpTemp1, $fpUnit1);
     print("<br/>");
@@ -162,23 +96,37 @@ function PrintOutdoorDataBrick($rgchTempColour, $fpTemp1, $fpUnit1, $fpHumidity,
     print("</td></tr>");
     print("</table>");
 
+    // Get our current operating season mode
+    $rgchSeason = rgchGetCurrentSeasonMode();
+
     // If we are in SMOKE season - set up SMOKE!
-    $data = file_get_contents("tempWindows");
-    $data = mb_substr($data, strpos($data, '{'));
-    $data = mb_substr($data, 0, -1);
-    $windows = json_decode($data, true);
-    if ( $windows["season"] == "smoke" ) {
+    if ( $rgchSeason == "smoke" ) {
         print('<br><div class="temp"><span style="color: orange">smoke</span></div>');
         print('<span style="color: darkred">protocol is in effect</span>');
         }
 
     // display other protocol if in any other protocol.
-    if ( ( $windows["season"] == "summer" ) ||
-         ( $windows["season"] == "winter" ) ) {
+    if ( ( $rgchSeason == "summer" ) ||
+         ( $rgchSeason == "winter" ) ) {
         printf('<br><div class="temp" style="color: purple">%s</span></div>',
-            $windows["season"]);
+            $rgchSeason);
         print('protocol is in effect');
         }
+
+    // display air quality
+    print "<br>&nbsp;<br>air inside " . $iInPPM . " ppm | " . "outside " . $iOutPPM . " ppm";
+
+    // Get vent status
+    $rgchVentStatus = rgchAcquireVentStatus(0);
+    if ( $rgchVentStatus )
+        {
+        print('<br>air intake vent is ' . $rgchVentStatus . '<br>');
+        }
+        else
+        {
+        print('<br><span style="color: red">air exchange system <b>not responding</b></span>');
+        }
+    
 
     return;
 }
@@ -423,14 +371,13 @@ function PrintBarometricBlock($fpPressure) {
 // keys, I pause half of a second whenever that happens before trying again.
 // After 3 tries, I give up.
 
-$file = "https://api.ambientweather.net/v1/devices?applicationKey=__YOUR_APPLICATION_KEY__&apiKey=__YOUR_API_KEY__";
-$fileWeatherDataCache = "tempWeatherDataCache";
+// $file = "https://api.ambientweather.net/v1/devices?applicationKey=1937589558be4416801ba9ce91c33d527b9db0be9cc9495a8d3871bd0290f104&apiKey=17b3b7b32ae54fe7b3c5102ebf10706493f792652940453390ba19d7267ffc68";
 $rgchPolledOrCached = "Polled";
 $dataTries=0;
 
 do {
     $dataTries++;
-    $data = file_get_contents($file);
+    $data = file_get_contents($fileAmbientServer);
     $data = mb_substr($data, strpos($data, '{'));
     $data = mb_substr($data, 0, -1);
     $sensors = json_decode($data, true);
@@ -494,7 +441,8 @@ print("<tr>");
              $sensors['lastData']['tempf'], $sensors['lastData']['humidity'])
            ),
         fpConvertTemp($sensors['lastData']['temp1f']),
-        $chOurUnitLowercase);
+        $chOurUnitLowercase,
+        $sensors['lastData']['pm25_in'], $sensors['lastData']['pm25']);
     print("</td>");
 
     // column 2, row 1, wind
@@ -665,7 +613,7 @@ $datareaddate = DateTime::createFromFormat('U', $ts);
 // Set time zone
 $datareaddate->setTimezone(new DateTimeZone('America/Los_Angeles'));
 
-if ($_SERVER['REMOTE_ADDR'] != "__YOUR_DHCP_ROUTER__") // disable if not LAN
+if ($_SERVER['REMOTE_ADDR'] != $rgchOurIP) // disable if not LAN
     {
     $rgchModeLink=$rgchOperatingSeason;
     } else {
