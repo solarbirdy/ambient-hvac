@@ -39,6 +39,9 @@ $rgchStationNames = array(
     4 => "north", 'north' => "sensed"            // <--------------- station 4
     );
 
+// default operating season at very first initial startup
+$rgchOperatingSeason="summer";                   // <--------------- must be spring, summer, smoke, fall, winter, disable
+
 // this is the IP address of your server
 global $rgchOurIP;
 $rgchOurIP = "192.168.1.1";                     // <--------------- IP goes here

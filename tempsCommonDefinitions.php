@@ -52,6 +52,4 @@ if ($chOurUnitCaps == $chRankineUnitCaps) {
     $chOtherUnitPage2=$chFarenheitPage;
     }
 
-$rgchOperatingSeason="summer";
-
 ?>

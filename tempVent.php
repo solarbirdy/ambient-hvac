@@ -7,8 +7,6 @@
 
 <?php // If not on the LAN, bounce home.
 
-    // $chOurUnitCaps = "C";
-
     // include common definitions, we'll need these throughout
     include 'tempsCommonDefinitions.php';
     // include common functions code, we'll need these throughout
@@ -118,6 +116,13 @@ if ( $rgchOperatingSeason == "summer" ) {
     // least two degrees F. This is to buffer for error range on indoor averages.
     if ( $fUseTemperature ) {
         if ( $InsideAvg > ( $Outside + 1.99 ) ) { $rgchSetVentStatus[0] = "open"; }
+        }
+    }
+
+// spring and fall/autumn are the same - open vent half the time, every odd-numbered hour
+if (( $rgchOperatingSeason == "spring" ) || ( $rgchOperatingSeason == "fall" )) {
+    if  ( $arrTime['tm_hour'] % 2 == 1 ) {
+        $rgchSetVentStatus[0] = "open";
         }
     }
 

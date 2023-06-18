@@ -124,9 +124,13 @@ function DisplayLocationStatus($rgchLocation, $fpTemp1, $fpTemp2) {
     // ...this is the wrong way to do it - we should be checking for a
     // humidity of zero, but we don't have those numbers with us, so can't.
     if ( ($rgchOperatingSeason=="disable") ||		  // disabled
+         ($rgchOperatingSeason=="spring") ||              // spring
+         ($rgchOperatingSeason=="fall") ||                // fall
          ($_SERVER['REMOTE_ADDR'] != $rgchOurIP) ||	  // disable off LAN
          (($fpTemp1 == 0) || ($fpTemp2 == 0)) )           // invalid temp(s)
-        $rgchShouldBe=$rgchWindowStatus;
+        $rgchShouldBe=$rgchWindowStatus;                  // this effectively suppresses window status suggestions
+                                                          // by making the current status always correct
+    // smoke season means windows always closed
     if ($rgchOperatingSeason=="smoke") $rgchShouldBe="closed";
 
     $rgchLocationStyle="locationOK";

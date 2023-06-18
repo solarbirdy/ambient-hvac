@@ -103,11 +103,7 @@ function PrintOutdoorDataBrick($rgchTempColour, $fpTemp1, $fpUnit1, $fpHumidity,
     if ( $rgchSeason == "smoke" ) {
         print('<br><div class="temp"><span style="color: orange">smoke</span></div>');
         print('<span style="color: darkred">protocol is in effect</span>');
-        }
-
-    // display other protocol if in any other protocol.
-    if ( ( $rgchSeason == "summer" ) ||
-         ( $rgchSeason == "winter" ) ) {
+        } else {
         printf('<br><div class="temp" style="color: purple">%s</span></div>',
             $rgchSeason);
         print('protocol is in effect');

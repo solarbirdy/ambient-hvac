@@ -156,6 +156,22 @@ echo "(open ppm) ";
             }
         }
 
+// spring and fall/autumn are the same - open vent half the time, every odd-numbered hour
+if (( $rgchOperatingSeason == "spring" ) || ( $rgchOperatingSeason == "fall" )) {
+    if  ( $arrTime['tm_hour'] % 2 == 1 ) {
+        $rgchSetVentStatus[0] = "open";
+echo "(open time) ";
+        // in fall/autumn mode, act like summer - if indoor air qualifies as clean,
+        // don't exchange, but if it's not clean, if outside is better, start exchange.
+        if ( !$fInsideAirClean ) {
+            if ( $fOutsideAirBetter ) {
+echo "(open ppm) ";
+                $rgchSetVentStatus[0] = "open";
+                }
+            }
+        }
+    }
+
     // smoke mode
     if ( $rgchOperatingSeason == "smoke" ) {
         // Smoke means always closed

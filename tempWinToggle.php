@@ -53,6 +53,8 @@ if ( ($rgchStatusSet != "open" ) &&
      ($rgchStatusSet != "summer") &&
      ($rgchStatusSet != "winter") &&
      ($rgchStatusSet != "smoke") &&
+     ($rgchStatusSet != "spring") &&
+     ($rgchStatusSet != "fall") &&
      ($rgchStatusSet != "disable") )
     exit;
 

@@ -30,7 +30,9 @@ if ( $_SERVER['REMOTE_ADDR'] == $rgchOurIP ) { // on the lan, welcome to panel
     print '<a href="tempWinToggle.php/?window=' . $rgchStationNames[3] . '&status=closed">close</a> &nbsp; ' . $rgchStationNames[3] . ' &nbsp; '; // west up
     print '<a href="tempWinToggle.php/?window=' . $rgchStationNames[3] . '&status=open">open</a><br/>'; // west up
     print '<p>';
-    print '<center>select mode<br/><a href="tempWinToggle.php/?window=season&status=summer">summer</a> &nbsp; ';
+    print '<center>select mode<br/><a href="tempWinToggle.php/?window=season&status=spring">spring</a> &nbsp; ';
+    print '<a href="tempWinToggle.php/?window=season&status=summer">summer</a> &nbsp; ';
+    print '<a href="tempWinToggle.php/?window=season&status=fall">fall</a> &nbsp; ';
     print '<a href="tempWinToggle.php/?window=season&status=winter">winter</a> &nbsp; ';
     print '<a href="tempWinToggle.php/?window=season&status=smoke">smoke</a>';
     print '</p></center>';
