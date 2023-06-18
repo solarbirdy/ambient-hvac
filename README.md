@@ -19,7 +19,11 @@ Modes and windows/vents which cannot be automatically sensed can be changed on t
 
 CURRENT STATE
 
-Version 0.6 Alpha. This should not be seen as a simple package to install; it's not, at least not yet. It should be seen as base code which can be used to implement a similar solution specific to your location. I don't even consider this feature-complete, though all implemented functionality works as it should and most of it (everything except data cacheing) has some months of testing.
+Version 0.65 Alpha. This should not be seen as a simple package to install; it's not, at least not yet. It should be seen as base code which can be used to implement a similar solution specific to your location. I don't even consider this feature-complete, though all implemented functionality works as it should and most of it (everything except data cacheing) has some months of testing.
+
+CHANGELOG
+
+Version 0.65 adds "spring" and "fall" modes, which open the air exchange system hourly for an hour through the day, thus distributing open times across a range of temperatures. They also never suggest zone/window opening/closures, thus reducing unnecessary screen clutter. It also lets you set the initial startup season in the configuration file, listing the options. (The default was and still is "summer." Exposing this does virtually nothing since it's used literally once.)
 
 Version 0.6 adds a configuration file that actually works (on my machine lol), a substantial refactoring and consolidation of the code base (including a lot, and I do mean a lot, of redundant code elimination), the ability to name your air sensor pairs, and fixes a bunch of bugs. Basically, this is the long overdue "next drop" I promised early in the plague.
 
